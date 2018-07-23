@@ -1,3 +1,4 @@
 upload/know/*
 upload/unknown/*
 *.pyc
+**/*.pyc
