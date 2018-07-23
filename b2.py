@@ -93,6 +93,7 @@ def do_upload_know():
         file_name = os.path.join(upload_path_know, filedata.filename)
         try:
             filedata.save(file_name)  # 上传文件写入
+            getAllImages(upload_path_know)
         except IOError:
             return '上传文件失败'
         return '上传文件成功, 文件名: {}'.format(file_name)
@@ -107,9 +108,9 @@ def do_upload_unknown():
         file_name = os.path.join(upload_path_unknown, filedata.filename)
         try:
             filedata.save(file_name)  # 上传文件写入
-            return 'ppp{}'.format(main(upload_path_know,upload_path_unknown,filedata.filename))
+            return '{}'.format(main(upload_path_know,upload_path_unknown,filedata.filename))
         except IOError:
-			return 'pppm{}'.format(main(upload_path_know,upload_path_unknown,filedata.filename))
+			return '{}'.format(main(upload_path_know,upload_path_unknown,filedata.filename))
             
         return '上传文件成功, 文件名: {}'.format(file_name)
     else:

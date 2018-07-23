@@ -4,14 +4,10 @@ Created on Thu Jun 21 00:33:06 2018
 
 @author: Administrator
 """
-
-# -*- coding: utf-8 -*-
-
-# 检测人脸
 import face_recognition
 import cv2
 import os
-
+import pickle,pprint
 
 # for i in range(0, faceNum):
 #     top =  face_locations[i][0]
@@ -53,18 +49,46 @@ def judgeUnknown(path,filename):
     elif faceNum==0:
         return NO_FACE
     return 1
+def save(filename, contents): 
+  fh = open(filename, 'w') 
+  fh.write(contents) 
+  fh.close()
+def get(filename): 
+  fh = open(filename, 'r') 
+  a = fh.read()
+  fh.close()
+  return a.split("_")
 def getAllImages(path):
     Images = []
     Encodings = []
     i = 0
     for filename in os.listdir(path):              #listdir的参数是文件夹的路径
-        print filename
+        #print filename
         Images.append(face_recognition.load_image_file(path+"/"+filename))
         Image_name.append(filename)
         Encodings.append(face_recognition.face_encodings(Images[i])[0])
         i = i + 1
-    return Images,Encodings
+    print Encodings
+    print type(Encodings)
+    output = open('data.pkl', 'wb')
+    output_names = open('data1.pkl', 'wb')
+    # Pickle dictionary using protocol 0.
+    pickle.dump(Encodings, output,-1)
+    pickle.dump(Image_name, output_names,-1)
+    # Pickle the list using the highest protocol available.
+    #pickle.dump(selfref_list, output, -1)
 
+    output.close()
+    return Encodings
+def getAllImagesFromFile(path):
+    pkl_file1 = open('data.pkl', 'rb')
+    pkl_file2 = open('data1.pkl', 'rb')
+    data1 = pickle.load(pkl_file1)
+    data2 = pickle.load(pkl_file2)
+    pkl_file1.close()
+    pkl_file2.close()
+    return data1,data2
+    
 def getUnknownImage(path,filename):
     unknown_image = face_recognition.load_image_file(path+"/"+filename);
     unknown_encoding = face_recognition.face_encodings(unknown_image)[0]
@@ -86,10 +110,11 @@ def main(pathknow,pathunknown,unknownfilwname):
     if flag!=1:
         print "-1"
         return -1
-    Images,Encodings = getAllImages(pathknow)
+    Encodings,Image_name = getAllImagesFromFile(pathknow)
     unknown_encoding = getUnknownImage(pathunknown,unknownfilwname)
     results = getCompareResult(Encodings,unknown_encoding)
     result = getResult(results)
-    print "result",result
+    print "result",result,len(results)
     print result,Image_name[result]
     return Image_name[result]
+main('./upload/know','./upload/unknown','Carolin.jpg')
