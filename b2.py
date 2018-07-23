@@ -95,10 +95,10 @@ def do_upload_know():
             filedata.save(file_name)  # 上传文件写入
             getAllImages(upload_path_know)
         except IOError:
-            return '上传文件失败'
-        return '上传文件成功, 文件名: {}'.format(file_name)
+            return '2'
+        return '1'
     else:
-        return '上传文件失败'
+        return '-1'
 @route('/upload_unknown', method='POST')
 def do_upload_unknown():
     """处理上传文件"""
@@ -111,10 +111,9 @@ def do_upload_unknown():
             return '{}'.format(main(upload_path_know,upload_path_unknown,filedata.filename))
         except IOError:
 			return '{}'.format(main(upload_path_know,upload_path_unknown,filedata.filename))
-            
-        return '上传文件成功, 文件名: {}'.format(file_name)
+
     else:
-        return '上传文件失败'
+        return '-1'
  
 @route('/favicon.ico', method='GET')
 def server_static():

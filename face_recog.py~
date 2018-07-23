@@ -37,7 +37,7 @@ def judgeUnknown(path,filename):
     face_locations = face_recognition.face_locations(img)
     print face_locations
 
-    # 调用opencv函数显示图片 
+    # 调用opencv函数显示图片
  #   img = cv2.imread("obama.jpg")
     # cv2.namedWindow("原图")
     # cv2.imshow("原图", img)
