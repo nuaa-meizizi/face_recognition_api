@@ -126,4 +126,4 @@ def error404(error):
     """处理错误信息"""
     return '404 发生页面错误, 未找到内容'
  
-run(host='192.168.152.128', port=8080, reloader=True)  # reloader设置为True可以在更新代码时自动重载
+run(host='192.168.152.129', port=8080, reloader=True)  # reloader设置为True可以在更新代码时自动重载
