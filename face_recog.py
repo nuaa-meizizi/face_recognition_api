@@ -66,7 +66,7 @@ def getAllImages(path,output1 = 'data.pkl',output2 = 'data1.pkl'):
         #print filename
         Images.append(face_recognition.load_image_file(path+"/"+filename))
         Image_name.append(filename)
-        Encodings.append(face_recognition.face_encodings(Images[i])[0])
+        Encodings.append(face_recognition.face_encodings(Images[i],num_jitters=2)[0])
         i = i + 1
     print Encodings
     print type(Encodings)
@@ -94,15 +94,35 @@ def getUnknownImage(path,filename):
     unknown_encoding = face_recognition.face_encodings(unknown_image)[0]
     return unknown_encoding
 
-def getCompareResult(KnownEncodings,UnknownEncoding):
-    results = face_recognition.compare_faces(KnownEncodings, UnknownEncoding,tolerance=0.39)
-    return results
+def getCompareResult(KnownEncodings,UnknownEncoding,tolerance1=0.39):
+    a = face_recognition.face_distance(KnownEncodings, UnknownEncoding)
+   # print 'a',a
+    results = face_recognition.compare_faces(KnownEncodings, UnknownEncoding,tolerance=tolerance1)
+    return results,a
 
-def getResult(results):
+def getResult(results,distances):
     #print results
-    for i in range(0, len(results)):
-        if results[i] == True:
-            return i
+    q = []
+   # max_i = distances.tolist().index(max_distance)
+    d1 = distances.tolist()
+    d = distances.tolist()
+    d.sort()
+  #  d.reverse()
+    j = 0
+#    print distances[max_i],d[0]
+    for i in range(0,10):
+       # print i,d[i]
+        if results[d1.index(d[i])] == True:
+          q.append(d1.index(d[i]))
+          #j = j + 1
+         # if j == 5 : break
+  #  return q
+   # if results[max_i] == True:
+   #     return max_i
+   # for i in range(0, len(results)):
+      #  if results[i] == True:
+     #       q.append(i)
+    return q
     return -1
 
 def main(pathknow,pathunknown,unknownfilwname):
@@ -112,8 +132,8 @@ def main(pathknow,pathunknown,unknownfilwname):
         return -1
     Encodings,Image_name = getAllImagesFromFile(pathknow)
     unknown_encoding = getUnknownImage(pathunknown,unknownfilwname)
-    results = getCompareResult(Encodings,unknown_encoding)
-    result = getResult(results)
+    results,distances = getCompareResult(Encodings,unknown_encoding)
+    result = getResult(results,distances)
     print "result",result,len(results)
     print result,Image_name[result]
     return Image_name[result]
