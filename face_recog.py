@@ -58,7 +58,7 @@ def get(filename):
   a = fh.read()
   fh.close()
   return a.split("_")
-def getAllImages(path):
+def getAllImages(path,output1 = 'data.pkl',output2 = 'data1.pkl'):
     Images = []
     Encodings = []
     i = 0
@@ -70,8 +70,8 @@ def getAllImages(path):
         i = i + 1
     print Encodings
     print type(Encodings)
-    output = open('data.pkl', 'wb')
-    output_names = open('data1.pkl', 'wb')
+    output = open(output1, 'wb')
+    output_names = open(output2, 'wb')
     # Pickle dictionary using protocol 0.
     pickle.dump(Encodings, output,-1)
     pickle.dump(Image_name, output_names,-1)
@@ -80,9 +80,9 @@ def getAllImages(path):
 
     output.close()
     return Encodings
-def getAllImagesFromFile(path):
-    pkl_file1 = open('data.pkl', 'rb')
-    pkl_file2 = open('data1.pkl', 'rb')
+def getAllImagesFromFile(path,output1 = 'data.pkl',output2 = 'data1.pkl'):
+    pkl_file1 = open(output1, 'rb')
+    pkl_file2 = open(output2, 'rb')
     data1 = pickle.load(pkl_file1)
     data2 = pickle.load(pkl_file2)
     pkl_file1.close()
@@ -99,7 +99,7 @@ def getCompareResult(KnownEncodings,UnknownEncoding):
     return results
 
 def getResult(results):
-    print results
+    #print results
     for i in range(0, len(results)):
         if results[i] == True:
             return i
