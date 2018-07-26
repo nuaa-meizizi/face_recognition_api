@@ -4,11 +4,14 @@ Created on Thu Jun 21 00:33:06 2018
 
 @author: Administrator
 """
+# coding: utf8
 import face_recognition
 import cv2
 import os
 import pickle,pprint
-
+import sys
+reload(sys)
+sys.setdefaultencoding('utf8')
 # for i in range(0, faceNum):
 #     top =  face_locations[i][0]
 #     right =  face_locations[i][1]
@@ -33,7 +36,10 @@ def judgeUnknown(path,filename):
     E_MORE_THAN_ONE = -1
     NO_FACE = -2
     # 读取图片并识别人脸
-    img = face_recognition.load_image_file(path+"/"+filename)
+    try:
+        img = face_recognition.load_image_file(path+"/"+filename)
+    except:
+		return NO_FACE
     face_locations = face_recognition.face_locations(img)
     print face_locations
 
@@ -64,12 +70,16 @@ def getAllImages(path,output1 = 'data.pkl',output2 = 'data1.pkl'):
     i = 0
     for filename in os.listdir(path):              #listdir的参数是文件夹的路径
         #print filename
-        Images.append(face_recognition.load_image_file(path+"/"+filename))
+        #if i > 470:
+        Images = face_recognition.load_image_file(path+"/"+filename)
         Image_name.append(filename)
-        Encodings.append(face_recognition.face_encodings(Images[i],num_jitters=2)[0])
+        face_bounding_boxes = face_recognition.face_locations(Images)
+       # print i,filename
+        Encodings.append(face_recognition.face_encodings(Images,known_face_locations=face_bounding_boxes))
         i = i + 1
-    print Encodings
-    print type(Encodings)
+        if i > 50 : break
+   # print Encodings
+ #   print type(Encodings)
     output = open(output1, 'wb')
     output_names = open(output2, 'wb')
     # Pickle dictionary using protocol 0.
@@ -80,6 +90,13 @@ def getAllImages(path,output1 = 'data.pkl',output2 = 'data1.pkl'):
 
     output.close()
     return Encodings
+def saveEncodings(path,Encodings,Image_name,output1 = 'data.pkl',output2 = 'data1.pkl'):
+    output = open(output1, 'wb')
+    output_names = open(output2, 'wb')
+    # Pickle dictionary using protocol 0.
+    pickle.dump(Encodings, output,-1)
+    pickle.dump(Image_name, output_names,-1)
+   
 def getAllImagesFromFile(path,output1 = 'data.pkl',output2 = 'data1.pkl'):
     pkl_file1 = open(output1, 'rb')
     pkl_file2 = open(output2, 'rb')
@@ -91,7 +108,13 @@ def getAllImagesFromFile(path,output1 = 'data.pkl',output2 = 'data1.pkl'):
     
 def getUnknownImage(path,filename):
     unknown_image = face_recognition.load_image_file(path+"/"+filename);
-    unknown_encoding = face_recognition.face_encodings(unknown_image)[0]
+    X_face_locations = face_recognition.face_locations(unknown_image)
+    # If no faces are found in the image, return an empty result.
+    if len(X_face_locations) == 0:
+        return []
+    # Find encodings for faces in the test iamge
+    unknown_encoding = face_recognition.face_encodings(unknown_image, known_face_locations=X_face_locations)
+ #   unknown_encoding = face_recognition.face_encodings(unknown_image)[0]
     return unknown_encoding
 
 def getCompareResult(KnownEncodings,UnknownEncoding,tolerance1=0.39):
@@ -125,15 +148,47 @@ def getResult(results,distances):
     return q
     return -1
 
-def main(pathknow,pathunknown,unknownfilwname):
+def main(pathknow,pathunknown,unknownfilwname,model_path):
+    distance_threshold = 0.39
+    flag = judgeUnknown(pathunknown,unknownfilwname)
+    if flag == 1:
+        unknown_encoding = getUnknownImage(pathunknown,unknownfilwname)
+        with open(model_path, 'rb') as f:
+            knn_clf = pickle.load(f)
+        closest_distances = knn_clf.kneighbors(unknown_encoding, n_neighbors=1)
+        are_matches = [closest_distances[0][0][0] <= distance_threshold]
+
+        # Predict classes and remove classifications that aren't within the threshold
+        a =[pred if rec else ("unknown") for pred, rec in zip(knn_clf.predict(unknown_encoding), are_matches)]
+        return a[0]
+    else:
+        return flag
+'''
     flag = judgeUnknown(pathunknown,unknownfilwname)
     if flag!=1:
         print "-1"
         return -1
-    Encodings,Image_name = getAllImagesFromFile(pathknow)
+    #Encodings,Image_name = getAllImagesFromFile(pathknow)
     unknown_encoding = getUnknownImage(pathunknown,unknownfilwname)
     results,distances = getCompareResult(Encodings,unknown_encoding)
     result = getResult(results,distances)
     print "result",result,len(results)
     print result,Image_name[result]
     return Image_name[result]
+'''
+
+
+#def get_data(pathknow,pathunknown):	
+#    getAllImages(pathknow,'data_know_2.pkl','data1_know_2.pkl')
+#    getAllImages(pathunknown, 'data_unknown_2.pkl', 'data1_unknown_2.pkl')
+#base_path = os.path.dirname(os.path.realpath(__file__))  # 获取脚本路径
+ 
+#upload_path_know = os.path.join(base_path, 'upload_test/','xh_10')   # 上传文件目录
+#if not os.path.exists(upload_path_know):
+#    os.makedirs(upload_path_know)
+ 
+#upload_path_unknown = os.path.join(base_path, 'upload_test/','sfzh_10')   # 上传文件目录
+#if not os.path.exists(upload_path_unknown):
+#    os.makedirs(upload_path_unknown)
+ 
+#get_data(upload_path_know,upload_path_unknown)

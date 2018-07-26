@@ -4,6 +4,7 @@
 import os
 from bottle import *
 from face_recog import main
+from ml_model import *
 import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
@@ -93,28 +94,32 @@ def do_upload_know():
         file_name = os.path.join(upload_path_know, filedata.filename)
         try:
             filedata.save(file_name)  # 上传文件写入
-            getAllImages(upload_path_know)
+    #        getAllImages(upload_path_know)
         except IOError:
             return '2'
         return '1'
     else:
         return '-1'
+
 @route('/upload_unknown', method='POST')
 def do_upload_unknown():
     """处理上传文件"""
     filedata = request.files.get('fileField')
-     
+    print filedata
     if filedata.file:
         file_name = os.path.join(upload_path_unknown, filedata.filename)
         try:
             filedata.save(file_name)  # 上传文件写入
-            return '{}'.format(main(upload_path_know,upload_path_unknown,filedata.filename))
+            return '{}'.format(main(upload_path_know,upload_path_unknown,filedata.filename,'./models/trained_knn_model_xh_10_done.clf'))
         except IOError:
-			return '{}'.format(main(upload_path_know,upload_path_unknown,filedata.filename))
-
+            return '{}'.format(main(upload_path_know,upload_path_unknown,filedata.filename,'./models/trained_knn_model_xh_10_done.clf'))
     else:
         return '-1'
- 
+
+@route('/train_model',method='GET')
+def train_model():
+    classifier = train("knn_examples/xh_10_done", model_save_path="trained_knn_model_10.clf", n_neighbors=3)
+    return 1
 @route('/favicon.ico', method='GET')
 def server_static():
     """处理网站图标文件, 找个图标文件放在脚本目录里"""
@@ -125,5 +130,6 @@ def server_static():
 def error404(error):
     """处理错误信息"""
     return '404 发生页面错误, 未找到内容'
+
  
-run(host='192.168.152.129', port=8080, reloader=True)  # reloader设置为True可以在更新代码时自动重载
+run(host='192.168.152.132', port=8080, reloader=True)  # reloader设置为True可以在更新代码时自动重载
