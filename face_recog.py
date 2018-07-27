@@ -12,25 +12,6 @@ import pickle,pprint
 import sys
 reload(sys)
 sys.setdefaultencoding('utf8')
-# for i in range(0, faceNum):
-#     top =  face_locations[i][0]
-#     right =  face_locations[i][1]
-#     bottom = face_locations[i][2]
-#     left = face_locations[i][3]
-
-#     start = (left, top)
-#     end = (right, bottom)
-
-#     color = (55,255,155)
-#     thickness = 3
-#     cv2.rectangle(img, start, end, color, thickness)
-
-# # 显示识别结果
-# cv2.namedWindow("识别")
-# cv2.imshow("识别", img)
-
-# cv2.waitKey(0)
-# cv2.destroyAllWindows()
 Image_name = []
 def judgeUnknown(path,filename):
     E_MORE_THAN_ONE = -1
@@ -150,7 +131,7 @@ def getResult(results,distances):
     return -1
 
 def main(pathknow,pathunknown,unknownfilwname,model_path):
-    distance_threshold = 0.39
+    distance_threshold = 0.6
     flag = judgeUnknown(pathunknown,unknownfilwname)
     if flag == 1:
         unknown_encoding = getUnknownImage(pathunknown,unknownfilwname)
@@ -164,32 +145,3 @@ def main(pathknow,pathunknown,unknownfilwname,model_path):
         return a[0]
     else:
         return flag
-'''
-    flag = judgeUnknown(pathunknown,unknownfilwname)
-    if flag!=1:
-        print "-1"
-        return -1
-    #Encodings,Image_name = getAllImagesFromFile(pathknow)
-    unknown_encoding = getUnknownImage(pathunknown,unknownfilwname)
-    results,distances = getCompareResult(Encodings,unknown_encoding)
-    result = getResult(results,distances)
-    print "result",result,len(results)
-    print result,Image_name[result]
-    return Image_name[result]
-'''
-
-
-#def get_data(pathknow,pathunknown):	
-#    getAllImages(pathknow,'data_know_2.pkl','data1_know_2.pkl')
-#    getAllImages(pathunknown, 'data_unknown_2.pkl', 'data1_unknown_2.pkl')
-#base_path = os.path.dirname(os.path.realpath(__file__))  # 获取脚本路径
- 
-#upload_path_know = os.path.join(base_path, 'upload_test/','xh_10')   # 上传文件目录
-#if not os.path.exists(upload_path_know):
-#    os.makedirs(upload_path_know)
- 
-#upload_path_unknown = os.path.join(base_path, 'upload_test/','sfzh_10')   # 上传文件目录
-#if not os.path.exists(upload_path_unknown):
-#    os.makedirs(upload_path_unknown)
- 
-#get_data(upload_path_know,upload_path_unknown)

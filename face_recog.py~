@@ -37,7 +37,7 @@ def judgeUnknown(path,filename):
     face_locations = face_recognition.face_locations(img)
     print face_locations
 
-    # 调用opencv函数显示图片
+    # 调用opencv函数显示图片 
  #   img = cv2.imread("obama.jpg")
     # cv2.namedWindow("原图")
     # cv2.imshow("原图", img)
@@ -58,7 +58,7 @@ def get(filename):
   a = fh.read()
   fh.close()
   return a.split("_")
-def getAllImages(path):
+def getAllImages(path,output1 = 'data.pkl',output2 = 'data1.pkl'):
     Images = []
     Encodings = []
     i = 0
@@ -66,12 +66,12 @@ def getAllImages(path):
         #print filename
         Images.append(face_recognition.load_image_file(path+"/"+filename))
         Image_name.append(filename)
-        Encodings.append(face_recognition.face_encodings(Images[i])[0])
+        Encodings.append(face_recognition.face_encodings(Images[i],num_jitters=2)[0])
         i = i + 1
     print Encodings
     print type(Encodings)
-    output = open('data.pkl', 'wb')
-    output_names = open('data1.pkl', 'wb')
+    output = open(output1, 'wb')
+    output_names = open(output2, 'wb')
     # Pickle dictionary using protocol 0.
     pickle.dump(Encodings, output,-1)
     pickle.dump(Image_name, output_names,-1)
@@ -80,9 +80,9 @@ def getAllImages(path):
 
     output.close()
     return Encodings
-def getAllImagesFromFile(path):
-    pkl_file1 = open('data.pkl', 'rb')
-    pkl_file2 = open('data1.pkl', 'rb')
+def getAllImagesFromFile(path,output1 = 'data.pkl',output2 = 'data1.pkl'):
+    pkl_file1 = open(output1, 'rb')
+    pkl_file2 = open(output2, 'rb')
     data1 = pickle.load(pkl_file1)
     data2 = pickle.load(pkl_file2)
     pkl_file1.close()
@@ -94,15 +94,35 @@ def getUnknownImage(path,filename):
     unknown_encoding = face_recognition.face_encodings(unknown_image)[0]
     return unknown_encoding
 
-def getCompareResult(KnownEncodings,UnknownEncoding):
-    results = face_recognition.compare_faces(KnownEncodings, UnknownEncoding,tolerance=0.39)
-    return results
+def getCompareResult(KnownEncodings,UnknownEncoding,tolerance1=0.39):
+    a = face_recognition.face_distance(KnownEncodings, UnknownEncoding)
+   # print 'a',a
+    results = face_recognition.compare_faces(KnownEncodings, UnknownEncoding,tolerance=tolerance1)
+    return results,a
 
-def getResult(results):
-    print results
-    for i in range(0, len(results)):
-        if results[i] == True:
-            return i
+def getResult(results,distances):
+    #print results
+    q = []
+   # max_i = distances.tolist().index(max_distance)
+    d1 = distances.tolist()
+    d = distances.tolist()
+    d.sort()
+  #  d.reverse()
+    j = 0
+#    print distances[max_i],d[0]
+    for i in range(0,10):
+       # print i,d[i]
+        if results[d1.index(d[i])] == True:
+          q.append(d1.index(d[i]))
+          #j = j + 1
+         # if j == 5 : break
+  #  return q
+   # if results[max_i] == True:
+   #     return max_i
+   # for i in range(0, len(results)):
+      #  if results[i] == True:
+     #       q.append(i)
+    return q
     return -1
 
 def main(pathknow,pathunknown,unknownfilwname):
@@ -112,8 +132,8 @@ def main(pathknow,pathunknown,unknownfilwname):
         return -1
     Encodings,Image_name = getAllImagesFromFile(pathknow)
     unknown_encoding = getUnknownImage(pathunknown,unknownfilwname)
-    results = getCompareResult(Encodings,unknown_encoding)
-    result = getResult(results)
+    results,distances = getCompareResult(Encodings,unknown_encoding)
+    result = getResult(results,distances)
     print "result",result,len(results)
     print result,Image_name[result]
     return Image_name[result]

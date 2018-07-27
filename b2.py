@@ -129,16 +129,16 @@ def do_upload_unknown():
     filedata = request.files.get('fileField')
     if filedata.file:
         file_name = os.path.join(upload_path_unknown, filedata.filename)
-        try:
+        if os.path.exists(file_name)==False:
             filedata.save(file_name)  # 上传文件写入
-            flag = judgeUnknown(upload_path_unknown,filedata.filename)
-            if flag == E_MORE_THAN_ONE:
-                return result.error('E_MORE_THAN_ONE',flag)
-            elif flag == NO_FACE:
-                return result.error('NO_FACE',flag)
-            return result.success('{}'.format(main(upload_path_know,upload_path_unknown,filedata.filename,'./models/trained_knn_model_xh_10_done.clf')))
-        except IOError:
-            return result.success('{}'.format(main(upload_path_know,upload_path_unknown,filedata.filename,'./models/trained_knn_model_xh_10_done.clf')))
+        flag = judgeUnknown(upload_path_unknown,filedata.filename)
+        if flag == E_MORE_THAN_ONE:
+            return result.error('E_MORE_THAN_ONE',flag)
+        elif flag == NO_FACE:
+            return result.error('NO_FACE',flag)
+        return result.success('{}'.format(main(upload_path_know,upload_path_unknown,filedata.filename,'./models/1233/trained_knn_model_10.clf')))
+       # else:
+       #     return result.success('{}'.format(main(upload_path_know,upload_path_unknown,filedata.filename,'./models/1233/trained_knn_model_10.clf')))
     else:
         return result.error('got no pic',-1)
 
