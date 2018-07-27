@@ -41,7 +41,7 @@ def judgeUnknown(path,filename):
     except:
 		return NO_FACE
     face_locations = face_recognition.face_locations(img)
-    print face_locations
+    print face_locations,'ll'
 
     # 调用opencv函数显示图片 
  #   img = cv2.imread("obama.jpg")
@@ -50,6 +50,7 @@ def judgeUnknown(path,filename):
 
     # 遍历每个人脸，并标注
     faceNum = len(face_locations)
+    print 'faceNum',faceNum
     if faceNum>1:
         return E_MORE_THAN_ONE
     elif faceNum==0:
