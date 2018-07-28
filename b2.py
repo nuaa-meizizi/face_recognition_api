@@ -3,7 +3,7 @@
 
 import os
 from bottle import *
-from face_recog import main,judgeUnknown
+from face_recog import main,judgeUnknown,saveEncoding
 from ml_model import *
 import sys
 from include.result import *
@@ -70,17 +70,23 @@ base_path = os.path.dirname(os.path.realpath(__file__))  # 获取脚本路径
  
 upload_path_know = os.path.join(base_path, 'upload/','know')   # 上传文件目录
 if not os.path.exists(upload_path_know):
-    os.makedirs(upload_path_know)
+    os.makedirs(upknowload_path_know)
+
 upload_path_tmp = os.path.join(base_path, 'upload/','tmp')   # 上传文件目录
 if not os.path.exists(upload_path_tmp):
     os.makedirs(upload_path_tmp)
+
 upload_path_unknown = os.path.join(base_path, 'upload/','unknown')   # 上传文件目录
 if not os.path.exists(upload_path_unknown):
     os.makedirs(upload_path_unknown)
-result=Result()
+
+upload_path_encoding = os.path.join(base_path, 'upload/','encoding')   # 上传文件目录
+if not os.path.exists(upload_path_encoding):
+    os.makedirs(upload_path_encoding)
+
 E_MORE_THAN_ONE = -1
 NO_FACE = -2
- 
+
 @route('/', method='GET')
 @route('/upload_know', method='GET')
 @route('/index.html', method='GET')
@@ -91,10 +97,11 @@ NO_FACE = -2
 def index():
     """显示上传页"""
     return HTML
- 
- 
+
 @route('/upload_know', method='POST')
 def do_upload_know():
+    result=Result()
+    result.set_null()
     """处理上传文件"""
     filedata = request.files.get('fileField')
     print filedata
@@ -102,14 +109,21 @@ def do_upload_know():
     if filedata.file:
 
         file_name = os.path.join(upload_path_tmp, filedata.filename)
-        if os.path.exists(file_name)==False:
+        if not os.path.exists(file_name):
+     
             print('not exits')
+           # file_name = os.path.join(file_name, file_name)
             filedata.save(file_name)  # 上传文件写入
             flag = judgeUnknown(upload_path_tmp, filedata.filename)
             if flag == 1:
-              #  os.remove(file_name)
-                file_name = os.path.join(upload_path_know, filedata.filename)
+              #  os.remove(file_name) 
+                file_name = os.path.join(upload_path_know, filedata.filename.split('.jpg')[0])
+                os.makedirs(file_name)
+                file_name = os.path.join(file_name, filedata.filename)
                 filedata.save(file_name)
+               # os.makedirs(file_name)
+                saveEncoding(file_name,upload_path_encoding,output1 = filedata.filename.split('.jpg')[0])
+                classifier = train("upload/encoding", model_save_path="models/upload1/upload1.clf", n_neighbors=3)
                 return result.success('upload success')
             else:
                 os.remove(file_name)
@@ -117,6 +131,7 @@ def do_upload_know():
                 return result.error('E_MORE_THAN_ONE',flag)
             elif flag == NO_FACE:
                 return result.error('NO_FACE',flag)
+            return result.error('NO_FACE',flag)
         else:
             return result.error('already_upload',2)
 #        getAllImages(upload_path_know)
@@ -125,6 +140,8 @@ def do_upload_know():
 
 @route('/upload_unknown', method='POST')
 def do_upload_unknown():
+    result=Result()
+    result.set_null()
     """处理上传文件"""
     filedata = request.files.get('fileField')
     if filedata.file:
@@ -136,7 +153,8 @@ def do_upload_unknown():
             return result.error('E_MORE_THAN_ONE',flag)
         elif flag == NO_FACE:
             return result.error('NO_FACE',flag)
-        return result.success('{}'.format(main(upload_path_know,upload_path_unknown,filedata.filename,'./models/1233/trained_knn_model_10.clf')))
+       # return result.success('{}'.format(main(upload_path_know,upload_path_unknown,filedata.filename,'./models/1233/trained_knn_model_10.clf')))
+        return result.success('{}'.format(main(upload_path_know,upload_path_unknown,filedata.filename,'models/upload1/upload1.clf')))
        # else:
        #     return result.success('{}'.format(main(upload_path_know,upload_path_unknown,filedata.filename,'./models/1233/trained_knn_model_10.clf')))
     else:
@@ -144,18 +162,24 @@ def do_upload_unknown():
 
 @route('/train_model',method='GET')
 def train_model():
-    classifier = train("knn_examples/xh_10_done", model_save_path="trained_knn_model_10.clf", n_neighbors=3)
+    result=Result()
+    result.set_null()
+    classifier = train("upload/know", model_save_path="models/upload1/upload1.clf", n_neighbors=3)
     return 1
 @route('/favicon.ico', method='GET')
 def server_static():
+    result.set_null()
+    result=Result()
     """处理网站图标文件, 找个图标文件放在脚本目录里"""
     return static_file('favicon.ico', root=base_path)
- 
+
  
 @error(404)
 def error404(error):
+    result=Result()
+    result.set_null()
     """处理错误信息"""
     return '404 发生页面错误, 未找到内容'
 
  
-run(host='192.168.152.133', port=8080, reloader=True)  # reloader设置为True可以在更新代码时自动重载
+run(host='192.168.152.134', port=8080, reloader=True)  # reloader设置为True可以在更新代码时自动重载

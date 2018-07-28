@@ -2,7 +2,10 @@ import json
 class Result(object) :
     return_data = {}
     def __init__(self):
+        self.return_data = {}
         print '...'
+    def set_null(self):
+        self.return_data = {}
     @classmethod
     def success(self,data = ''):
         self.return_data['code']=0

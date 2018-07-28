@@ -78,7 +78,15 @@ def saveEncodings(path,Encodings,Image_name,output1 = 'data.pkl',output2 = 'data
     # Pickle dictionary using protocol 0.
     pickle.dump(Encodings, output,-1)
     pickle.dump(Image_name, output_names,-1)
-   
+
+def saveEncoding(path,upload_path_encoding,output1 = 'data.pkl'):
+    image = face_recognition.load_image_file(path)
+    os.mkdir(upload_path_encoding+'/'+output1)
+    face_bounding_boxes = face_recognition.face_locations(image)               
+    Encoding = face_recognition.face_encodings(image, known_face_locations=face_bounding_boxes)[0]
+    output = open(upload_path_encoding+'/'+output1+'/'+output1, 'wb')
+    # Pickle dictionary using protocol 0.
+    pickle.dump(Encoding, output,-1)
 def getAllImagesFromFile(path,output1 = 'data.pkl',output2 = 'data1.pkl'):
     pkl_file1 = open(output1, 'rb')
     pkl_file2 = open(output2, 'rb')
