@@ -55,25 +55,9 @@ def train(train_dir, model_save_path=None, n_neighbors=None, knn_algo='ball_tree
     for class_dir in os.listdir(train_dir):
         if not os.path.isdir(os.path.join(train_dir, class_dir)):
             continue
-     #   print('pppp come in',class_dir)
-        # Loop through each training image for the current person
-       # for img_path in os.listdir(os.path.join(train_dir, class_dir)):
-      #  print('img_path',img_path)
-       # print(os.path.join(train_dir, class_dir,class_dir))
         pkl_file1 = open(os.path.join(train_dir, class_dir,class_dir), 'rb')
         Encoding = pickle.load(pkl_file1)
         pkl_file1.close()
-      #  print(Encoding)
-
-       #     image = face_recognition.load_image_file(img_path)
-       #     face_bounding_boxes = face_recognition.face_locations(image)
-
-      #      if len(face_bounding_boxes) != 1:
-                # If there are no people (or too many people) in a training image, skip the image.
-       #         if verbose:
-       #             print("Image {} not suitable for training: {}".format(img_path, "Didn't find a face" if len(face_bounding_boxes) < 1 else "Found more than one face"))
-       #     else:
-                # Add face encoding for current image to the training set
         X.append(Encoding)
         y.append(class_dir)
 
@@ -84,7 +68,6 @@ def train(train_dir, model_save_path=None, n_neighbors=None, knn_algo='ball_tree
             print("Chose n_neighbors automatically:", n_neighbors)
    # saveEncodings(X,y,'encodings/1233/known_data_1.pkl','encodings/1233/known_data1_1.pkl')
 
-  #  print('save ok')
     # Create and train the KNN classifier
     knn_clf = neighbors.KNeighborsClassifier(n_neighbors=n_neighbors, algorithm=knn_algo, weights='distance')
     knn_clf.fit(X, y)
@@ -95,7 +78,7 @@ def train(train_dir, model_save_path=None, n_neighbors=None, knn_algo='ball_tree
             pickle.dump(knn_clf, f)
 
     return knn_clf
- 
+
 
 
 def predict(X_img_path, knn_clf=None, model_path=None, distance_threshold=0.39):
@@ -169,10 +152,10 @@ def test_model():
             else :
               q.append(name)
               print(name,image_file[0:9])
-            
+
             faces_encodings.append(unen)
             X_img_path.append(unname)
     saveEncodings(faces_encodings,X_img_path,'encodings/1233/unknown_data_1.pkl','encodings/1233/unknown_data1_1.pkl')
     print(j)
-     
+
     print(q,len(q))

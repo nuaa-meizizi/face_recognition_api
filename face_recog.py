@@ -24,17 +24,12 @@ def judgeUnknown(path,filename):
     face_locations = face_recognition.face_locations(img)
     print face_locations,'ll'
 
-    # 调用opencv函数显示图片 
- #   img = cv2.imread("obama.jpg")
-    # cv2.namedWindow("原图")
-    # cv2.imshow("原图", img)
-
     # 遍历每个人脸，并标注
     faceNum = len(face_locations)
     print 'faceNum',faceNum
-    if faceNum>1:
+    if faceNum > 1:
         return E_MORE_THAN_ONE
-    elif faceNum==0:
+    elif faceNum == 0:
         return NO_FACE
     return 1
 def save(filename, contents): 
@@ -59,9 +54,6 @@ def getAllImages(path,output1 = 'data.pkl',output2 = 'data1.pkl'):
        # print i,filename
         Encodings.append(face_recognition.face_encodings(Images,known_face_locations=face_bounding_boxes))
         i = i + 1
-        if i > 50 : break
-   # print Encodings
- #   print type(Encodings)
     output = open(output1, 'wb')
     output_names = open(output2, 'wb')
     # Pickle dictionary using protocol 0.
@@ -109,35 +101,21 @@ def getUnknownImage(path,filename):
 
 def getCompareResult(KnownEncodings,UnknownEncoding,tolerance1=0.39):
     a = face_recognition.face_distance(KnownEncodings, UnknownEncoding)
-   # print 'a',a
     results = face_recognition.compare_faces(KnownEncodings, UnknownEncoding,tolerance=tolerance1)
     return results,a
 
 def getResult(results,distances):
-    #print results
     q = []
-   # max_i = distances.tolist().index(max_distance)
     d1 = distances.tolist()
     d = distances.tolist()
     d.sort()
-  #  d.reverse()
     j = 0
-#    print distances[max_i],d[0]
     for i in range(0,10):
-       # print i,d[i]
         if results[d1.index(d[i])] == True:
           q.append(d1.index(d[i]))
-          #j = j + 1
-         # if j == 5 : break
-  #  return q
-   # if results[max_i] == True:
-   #     return max_i
-   # for i in range(0, len(results)):
-      #  if results[i] == True:
-     #       q.append(i)
     return q
-    return -1
-
+    # return -1
+"""提取人脸特征,通过knn计算出最相近的人脸"""
 def main(pathknow,pathunknown,unknownfilwname,model_path):
     distance_threshold = 0.6
     flag = judgeUnknown(pathunknown,unknownfilwname)
