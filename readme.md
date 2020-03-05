@@ -1,7 +1,11 @@
 # 人脸识别接口
-美滋滋团队2018年软件杯车载APP赛题的人脸识别api，两年后运行还是能运行成功，挺惊喜的，哈哈哈。
+美滋滋战队2018年软件杯车载APP赛题的人脸识别api，两年后运行还是能运行成功，挺惊喜的，哈哈哈。
+
+* [美滋滋战队-软件杯2018-智能车载app演示视频](https://www.bilibili.com/video/av25826292/)
+* [美滋滋战队-软件杯2018-智能车载app演示视频-2](https://www.bilibili.com/video/av25826292/?p=2)
 
 功能主要有两个，一个是上传人脸图片，一个是识别人脸，可用于身份认证，人脸识别登陆。
+
 ## 环境
 * Python 3.3+ or Python 2.7
 * macOS or Linux (Windows not officially supported, but might work)
